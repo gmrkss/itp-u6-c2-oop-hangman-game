@@ -20,10 +20,9 @@ class GuessAttempt(object):
         return False
 
 class GuessWord(object):
-    def __init__(self, answer, masked=None):#, guess=GuessAttempt()):
+    def __init__(self, answer, masked=None):
         self.answer = answer
         self.masked = len(self.answer)*"*"
-#         self.guess = guess
         if self.answer=='':
             raise InvalidWordException
 
@@ -31,7 +30,49 @@ class GuessWord(object):
         if len(attempt)>1:
             raise InvalidGuessedLetterException
         
+        if attempt in self.answer:
+            GuessAttempt(attempt, hit=True, miss=False)
+            answer_word_chars=[]
+            masked_word_chars=[]
+            for char in self.answer:
+                answer_word_chars.append(char)
+            for char in self.masked:
+                masked_word_chars.append(char)
+
+            for index, char in enumerate(answer_word_chars):
+                if char==attempt:
+                    masked_word_chars[index]=attempt
+
+            self.masked=''.join(masked_word_chars)    
+
+            return self.masked
+
+
+#     def perform_attempt(self, guess):
+#         # attempt = GuessAttempt(attempt, hit=None, miss=None)
+        
+#         if len(guess)>1:
+#             raise InvalidGuessedLetterException
+        
+#         if guess in self.answer:
+#             # setattr(attempt, hit, True)
+#             # setattr(attempt, miss, False)
+#             answer_word_chars=[]
+#             masked_word_chars=[]
+#             for char in self.answer:
+#                 answer_word_chars.append(char)
+#             for char in self.masked:
+#                 masked_word_chars.append(char)
             
+#             for index, char in enumerate(answer_word_chars):
+#                 if char==attempt.attempt:
+#                     masked_word_chars[index]=guess
+    
+#             self.masked=''.join(masked_word_chars)
+            
+#             guess = GuessAttempt(guess, hit=True, miss=False)
+            
+#             return self.masked
         
 
 class HangmanGame(object):
