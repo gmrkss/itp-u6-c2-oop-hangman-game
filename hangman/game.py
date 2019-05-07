@@ -51,41 +51,60 @@ class GuessWord(object):
             return GuessAttempt(attempt, miss=True)
 
 class HangmanGame(object):
-    def __init__(self, list_of_words=['rmotr', 'python', 'awesome'], number_of_guesses=5):
+    WORD_LIST = ['rmotr', 'python', 'awesome']
+    
+    def __init__(self, list_of_words=None, number_of_guesses=5):
         self.remaining_misses = number_of_guesses
-        self.word = GuessWord(HangmanGame.select_random_word(list_of_words))
+        if list_of_words is None:
+            self.word = GuessWord(HangmanGame.select_random_word(HangmanGame.WORD_LIST))
+        else:
+            self.word = GuessWord(HangmanGame.select_random_word(list_of_words))
         self.previous_guesses=[]
-        self.WORD_LIST = list_of_words
     
     @classmethod
     def select_random_word(cls, list_of_words):
         if list_of_words == []:
             raise InvalidListOfWordsException
         return random.choice(list_of_words)
-
     
+    def guess(self, guess):
+        guess = guess.lower()
+        if guess in self.word.answer:
+            self.previous_guesses.append(guess)
+            return self.word.perform_attempt(guess)
+        else:
+            self.previous_guesses.append(guess)
+            self.remaining_misses-=1
+            return res
+#             return self.word.perform_attempt(guess)
     
-    
-#     def start_new_game(self):
-#         select_random_word(self)
-#         if self == []:
-#             raise InvalidListOfWordsException
+    def is_won(self):
+        if self.word.answer == self.word.masked:
+            return True
+        return False
         
+    def is_lost(self):
+        if self.word.answer == self.word.masked:
+            return True
+        return False
         
+    def is_finished(self):
+        if self.is_won(self) or self.is_lost(self):
+            return True
+
         
-    
-    
-#     def start_new_game(list_of_words=None, number_of_guesses=5):
-#     if list_of_words is None:
-#         list_of_words = LIST_OF_WORDS
+            
 
-#     word_to_guess = _get_random_word(list_of_words)
-#     masked_word = _mask_word(word_to_guess)
-#     game = {
-#         'answer_word': word_to_guess,
-#         'masked_word': masked_word,
-#         'previous_guesses': [],
-#         'remaining_misses': number_of_guesses,
-#     }
+### def test_game_with_two_correct_guesses_same_move() thought process
+# game = HangmanGame(['rmotr'])
+# # game is a HangmanGame class - this is created based on what you have
+# attempt = game.guess('r')
+# # game.guess() means guess is an instance method you need to define for the class of game, HangmanGame. That method should return a GuessAttempt instance object which is returned in the GuessWord instance method, perform_attempt. so guess should be passed through the perform_attempt instance method 
 
-#     return game
+# GuessWord.perform_attempt(guess)
+
+
+# assert attempt.is_hit() is True
+# assert game.remaining_misses == 5
+# assert game.previous_guesses == ['r']
+# assert game.word.masked == 'r***r'
