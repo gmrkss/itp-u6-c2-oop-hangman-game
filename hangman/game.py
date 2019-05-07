@@ -45,6 +45,9 @@ class GuessWord(object):
 
             self.masked=''.join(masked_word_chars)    
             
+            if self.answer == self.masked:
+                raise GameWonException
+            
             return GuessAttempt(attempt, hit=True)
 
         else:
@@ -75,8 +78,28 @@ class HangmanGame(object):
         else:
             self.previous_guesses.append(guess)
             self.remaining_misses-=1
-            return res
+            if self.remaining_misses==0:
+                if self.is_lost():
+                    raise GameLostException
+            return self.word.perform_attempt(guess)
+
+### new guess for Finished
+#     def guess(self, guess):
+#         guess = guess.lower()
+#         if self.remaining_misses>0:
+#             if self.is_finished():
+#                 raise GameFinishedException
+#             if guess in self.word.answer:
+#                 self.previous_guesses.append(guess)
+#                 return self.word.perform_attempt(guess)
+#             else:
+#                 self.previous_guesses.append(guess)
+#                 self.remaining_misses-=1
+#         if self.remaining_misses==0:
+#             if self.is_lost():
+#                 raise GameLostException
 #             return self.word.perform_attempt(guess)
+
     
     def is_won(self):
         if self.word.answer == self.word.masked:
@@ -85,12 +108,13 @@ class HangmanGame(object):
         
     def is_lost(self):
         if self.word.answer == self.word.masked:
-            return True
-        return False
+            return False
+        return True
         
     def is_finished(self):
-        if self.is_won(self) or self.is_lost(self):
+        if self.is_won() or self.is_lost():
             return True
+        return False
 
         
             
