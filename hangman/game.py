@@ -1,5 +1,5 @@
 from .exceptions import *
-
+import random
 
 class GuessAttempt(object):
     def __init__(self, attempt, hit=None, miss=None):
@@ -21,13 +21,14 @@ class GuessAttempt(object):
 
 class GuessWord(object):
     def __init__(self, answer, masked=None, attempt=None):
-        self.answer = answer
+        self.answer = answer.lower()
         self.masked = len(self.answer)*"*"
         self.attempt = GuessAttempt(attempt, hit=None, miss=None)
         if self.answer=='':
             raise InvalidWordException
 
     def perform_attempt(self, attempt):
+        attempt = attempt.lower()
         if len(attempt)>1:
             raise InvalidGuessedLetterException
         
@@ -49,7 +50,44 @@ class GuessWord(object):
             setattr(self.attempt, 'miss', False)
             
             return self.attempt
-
+        
+        else:
+            setattr(self.attempt, 'hit', False)
+            setattr(self.attempt, 'miss', True)
+            
+            return self.attempt
 
 class HangmanGame(object):
-    pass
+    def __init__(self, list_of_words, number_of_guesses=5, remaining_misses=5):
+        self.list_of_words = list_of_words
+        self.number_of_guesses = number_of_guesses
+        self.remaining_misses = number_of_guesses
+    
+    def select_random_word(self):
+        if self == []:
+            raise InvalidListOfWordsException
+        return random.choice(self)
+        
+    def start_new_game(self):
+        select_random_word(self)
+        if self == []:
+            raise InvalidListOfWordsException
+        
+        
+        
+    
+    
+    def start_new_game(list_of_words=None, number_of_guesses=5):
+    if list_of_words is None:
+        list_of_words = LIST_OF_WORDS
+
+    word_to_guess = _get_random_word(list_of_words)
+    masked_word = _mask_word(word_to_guess)
+    game = {
+        'answer_word': word_to_guess,
+        'masked_word': masked_word,
+        'previous_guesses': [],
+        'remaining_misses': number_of_guesses,
+    }
+
+    return game
