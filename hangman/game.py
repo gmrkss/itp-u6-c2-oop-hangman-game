@@ -44,10 +44,6 @@ class GuessWord(object):
                     masked_word_chars[index]=attempt
 
             self.masked=''.join(masked_word_chars)    
-            
-            if self.answer == self.masked:
-                raise GameWonException
-            
             return GuessAttempt(attempt, hit=True)
 
         else:
@@ -72,9 +68,14 @@ class HangmanGame(object):
     
     def guess(self, guess):
         guess = guess.lower()
+        if self.is_finished():
+            raise GameFinishedException
         if guess in self.word.answer:
             self.previous_guesses.append(guess)
-            return self.word.perform_attempt(guess)
+            res = self.word.perform_attempt(guess)
+            if self.is_won():
+                raise GameWonException
+            return res
         else:
             self.previous_guesses.append(guess)
             self.remaining_misses-=1
@@ -82,24 +83,6 @@ class HangmanGame(object):
                 if self.is_lost():
                     raise GameLostException
             return self.word.perform_attempt(guess)
-
-### new guess for Finished
-#     def guess(self, guess):
-#         guess = guess.lower()
-#         if self.remaining_misses>0:
-#             if self.is_finished():
-#                 raise GameFinishedException
-#             if guess in self.word.answer:
-#                 self.previous_guesses.append(guess)
-#                 return self.word.perform_attempt(guess)
-#             else:
-#                 self.previous_guesses.append(guess)
-#                 self.remaining_misses-=1
-#         if self.remaining_misses==0:
-#             if self.is_lost():
-#                 raise GameLostException
-#             return self.word.perform_attempt(guess)
-
     
     def is_won(self):
         if self.word.answer == self.word.masked:
@@ -107,28 +90,18 @@ class HangmanGame(object):
         return False
         
     def is_lost(self):
-        if self.word.answer == self.word.masked:
-            return False
-        return True
+        if self.remaining_misses==0:
+            return True
+        return False
         
     def is_finished(self):
         if self.is_won() or self.is_lost():
             return True
         return False
 
-        
-            
 
 ### def test_game_with_two_correct_guesses_same_move() thought process
 # game = HangmanGame(['rmotr'])
 # # game is a HangmanGame class - this is created based on what you have
 # attempt = game.guess('r')
 # # game.guess() means guess is an instance method you need to define for the class of game, HangmanGame. That method should return a GuessAttempt instance object which is returned in the GuessWord instance method, perform_attempt. so guess should be passed through the perform_attempt instance method 
-
-# GuessWord.perform_attempt(guess)
-
-
-# assert attempt.is_hit() is True
-# assert game.remaining_misses == 5
-# assert game.previous_guesses == ['r']
-# assert game.word.masked == 'r***r'
